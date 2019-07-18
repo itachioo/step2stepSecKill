@@ -72,4 +72,15 @@ public class Exposer {
     }
 
 
+    @Override
+    public String toString() {
+        return "Exposer{" +
+                "isExposed=" + isExposed +
+                ", md5='" + md5 + '\'' +
+                ", seckillId=" + seckillId +
+                ", now=" + now +
+                ", start=" + start +
+                ", end=" + end +
+                '}';
+    }
 }
