@@ -2,6 +2,7 @@ package service.impl;
 
 import dao.SeckillDao;
 import dao.SuccessKilledDao;
+import dao.cache.RedisDao;
 import dto.Exposer;
 import dto.SeckillExecution;
 import entity.Seckill;
@@ -30,7 +31,8 @@ public class SeckillServiceImpl implements SeckillService {
     private final String salt = "fdsfklf23293654**&%%$^^&&^%&*()^^&";
     @Autowired   //注入service依赖
     private SeckillDao seckillDao;
-
+    @Autowired
+    private RedisDao redisDao;
     @Autowired
     private SuccessKilledDao successKilledDao;
     public List<Seckill> getSeckillList() {
@@ -42,9 +44,15 @@ public class SeckillServiceImpl implements SeckillService {
     }
 
     public Exposer exportSeckillUrl(long seckillId) {
-        Seckill seckill = seckillDao.queryById(seckillId);
+        Seckill seckill = redisDao.getSeckill(seckillId);
         if(seckill==null){
-            return new Exposer(false, seckillId);
+            seckill = seckillDao.queryById(seckillId);
+            if(seckill==null) {
+                return new Exposer(false, seckillId);
+            }
+            else {
+                redisDao.putSeckill(seckill);
+            }
         }
         Date startTime = seckill.getStartTime();
         Date endTime = seckill.getEndTime();
